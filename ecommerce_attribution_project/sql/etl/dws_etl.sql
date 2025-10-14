@@ -25,6 +25,7 @@ WITH user_sessions AS (
         stay_duration,
         path_step,
         is_product_detail,
+        user_path,
         extra_info
     FROM dwd_ecommerce_user_behavior_path
     WHERE dt='${hiveconf:dt}'
@@ -39,7 +40,8 @@ product_detail_visits AS (
         product_id,
         device_type,
         platform,
-        path_step as product_detail_step
+        path_step as product_detail_step,
+        user_path
     FROM user_sessions
     WHERE is_product_detail = true
 ),
@@ -55,6 +57,7 @@ entry_touchpoints AS (
         device_type,
         platform,
         path_step as entry_step,
+        user_path,
         -- 定义入口渠道规则
         CASE 
             WHEN source_channel = 'homepage' AND page_type = 'marketing' THEN 'homepage_marketing'
@@ -91,7 +94,7 @@ attribution_calculation AS (
         END as attribution_weight,
         pd.device_type,
         pd.platform,
-        CONCAT('entry_type:', et.entry_type, ';path_length:', pd.product_detail_step) as extra_attributes
+        CONCAT('entry_type:', et.entry_type, ';path_length:', pd.product_detail_step, ';user_path:', pd.user_path) as extra_attributes
     FROM product_detail_visits pd
     LEFT JOIN entry_touchpoints et 
         ON pd.uid = et.uid 

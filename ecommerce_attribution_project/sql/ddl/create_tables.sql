@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS dwd_ecommerce_user_behavior_path (
     stay_duration INT COMMENT '停留时长(秒)',
     path_step INT COMMENT '路径步骤序号',
     is_product_detail BOOLEAN COMMENT '是否为商详页',
+    user_path STRING COMMENT '按回退逻辑计算的会话路径(以->拼接的page_type序列)',
     extra_info STRING COMMENT '扩展信息'
 )
 COMMENT '电商用户行为路径明细表'
