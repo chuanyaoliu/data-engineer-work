@@ -1,0 +1,170 @@
+# 告警配置
+# 描述: 电商商详页流量归因数据需求告警规则
+# 版本: v1.0
+# 创建时间: 2024-01-01
+
+groups:
+  - name: ecommerce_attribution_alerts
+    rules:
+      # 数据质量告警
+      - alert: DataQualityError
+        expr: data_quality_monitor{quality_status="ERROR"} > 0
+        for: 5m
+        labels:
+          severity: critical
+          service: ecommerce_attribution
+          component: data_quality
+        annotations:
+          summary: "数据质量异常"
+          description: "表 {{ $labels.table_name }} 在 {{ $labels.dt }} 的数据质量状态为ERROR"
+          runbook_url: "https://wiki.company.com/runbooks/data_quality_error"
+
+      - alert: DataQualityWarning
+        expr: data_quality_monitor{quality_status="WARNING"} > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: data_quality
+        annotations:
+          summary: "数据质量警告"
+          description: "表 {{ $labels.table_name }} 在 {{ $labels.dt }} 的数据质量状态为WARNING"
+          runbook_url: "https://wiki.company.com/runbooks/data_quality_warning"
+
+      # 数据量告警
+      - alert: DataVolumeAnomaly
+        expr: data_volume_monitor{record_count} < 100
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: data_volume
+        annotations:
+          summary: "数据量异常"
+          description: "表 {{ $labels.table_name }} 在 {{ $labels.dt }} 的数据量异常低: {{ $value }}"
+          runbook_url: "https://wiki.company.com/runbooks/data_volume_anomaly"
+
+      - alert: DataVolumeSpike
+        expr: data_volume_monitor{record_count} > 100000
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: data_volume
+        annotations:
+          summary: "数据量激增"
+          description: "表 {{ $labels.table_name }} 在 {{ $labels.dt }} 的数据量异常高: {{ $value }}"
+          runbook_url: "https://wiki.company.com/runbooks/data_volume_spike"
+
+      # 性能告警
+      - alert: ETLPerformanceDegradation
+        expr: performance_monitor{duration_seconds} > 3600
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: performance
+        annotations:
+          summary: "ETL性能下降"
+          description: "{{ $labels.job_name }} 在 {{ $labels.dt }} 的执行时间过长: {{ $value }}秒"
+          runbook_url: "https://wiki.company.com/runbooks/etl_performance_degradation"
+
+      - alert: ETLExecutionFailure
+        expr: performance_monitor{duration_seconds} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: ecommerce_attribution
+          component: performance
+        annotations:
+          summary: "ETL执行失败"
+          description: "{{ $labels.job_name }} 在 {{ $labels.dt }} 执行失败"
+          runbook_url: "https://wiki.company.com/runbooks/etl_execution_failure"
+
+      # 资源使用告警
+      - alert: HighCPUUsage
+        expr: resource_usage_monitor{cpu_usage_percent} > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: resource
+        annotations:
+          summary: "CPU使用率过高"
+          description: "{{ $labels.job_name }} 在 {{ $labels.dt }} 的CPU使用率过高: {{ $value }}%"
+          runbook_url: "https://wiki.company.com/runbooks/high_cpu_usage"
+
+      - alert: HighMemoryUsage
+        expr: resource_usage_monitor{memory_usage_percent} > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: resource
+        annotations:
+          summary: "内存使用率过高"
+          description: "{{ $labels.job_name }} 在 {{ $labels.dt }} 的内存使用率过高: {{ $value }}%"
+          runbook_url: "https://wiki.company.com/runbooks/high_memory_usage"
+
+      # 数据倾斜告警
+      - alert: DataSkewDetected
+        expr: data_skew_monitor{skew_ratio} > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: data_skew
+        annotations:
+          summary: "数据倾斜检测"
+          description: "表 {{ $labels.table_name }} 在 {{ $labels.dt }} 存在数据倾斜，倾斜比: {{ $value }}"
+          runbook_url: "https://wiki.company.com/runbooks/data_skew_detected"
+
+      # 业务指标告警
+      - alert: BusinessMetricsAnomaly
+        expr: business_metrics_monitor{direct_visit_rate} < 0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: business_metrics
+        annotations:
+          summary: "业务指标异常"
+          description: "在 {{ $labels.dt }} 的直接访问率异常低: {{ $value }}%"
+          runbook_url: "https://wiki.company.com/runbooks/business_metrics_anomaly"
+
+      - alert: ConversionRateAnomaly
+        expr: business_metrics_monitor{avg_conversion_time} > 3600
+        for: 10m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: business_metrics
+        annotations:
+          summary: "转化时间异常"
+          description: "在 {{ $labels.dt }} 的平均转化时间异常长: {{ $value }}秒"
+          runbook_url: "https://wiki.company.com/runbooks/conversion_rate_anomaly"
+
+      # 查询性能告警
+      - alert: QueryPerformanceDegradation
+        expr: query_performance_monitor{execution_time_seconds} > 30
+        for: 5m
+        labels:
+          severity: warning
+          service: ecommerce_attribution
+          component: query_performance
+        annotations:
+          summary: "查询性能下降"
+          description: "查询 {{ $labels.query_name }} 在 {{ $labels.dt }} 的执行时间过长: {{ $value }}秒"
+          runbook_url: "https://wiki.company.com/runbooks/query_performance_degradation"
+
+      - alert: QueryExecutionFailure
+        expr: query_performance_monitor{status="ERROR"}
+        for: 1m
+        labels:
+          severity: critical
+          service: ecommerce_attribution
+          component: query_performance
+        annotations:
+          summary: "查询执行失败"
+          description: "查询 {{ $labels.query_name }} 在 {{ $labels.dt }} 执行失败"
+          runbook_url: "https://wiki.company.com/runbooks/query_execution_failure"
