@@ -170,3 +170,45 @@ hive -f sql/test/boundary_tests.sql
 
 **最后更新**：2024-01-01  
 **文档版本**：v1.0
+
+## Cursor 规则与使用
+
+- 规则清单见：`docs/rules/cursor_rules.md`
+- 在 Cursor 中打开 Rules 面板，按文档的「标题 / Scope / 内容」逐条创建：
+  - Global：启用「安全与合规」「性能回归防护」
+  - Workspace（本仓库）：启用「项目特定：电商归因口径」
+  - File pattern：为 `sql/**/*.sql`、`sql/etl/**`、`sql/test/**`、`**/dags/**/*.py`、`**/*.{py,scala}` 等按文档设置对应规则
+
+设置完成后，建议在提交前执行：
+```bash
+hive -f sql/test/run_all_tests.sql
+```
+以确保口径与规则一致。
+
+## 本地 Spark SQL 调试与测试
+
+### 依赖安装
+```bash
+pip install -r requirements.txt
+```
+
+### 本地回放与断言（沙箱）
+```bash
+python ecommerce_attribution_project/dev/dev_spark_sql_sandbox.py --target ecommerce_attribution_project/sql/etl/dws_etl.sql --mock ecommerce_attribution_project/sql/test/mock_data_generation.sql --assert-row-count -1 --show 50
+```
+
+### 运行 PyTest
+```bash
+pytest -q ecommerce_attribution_project/tests/spark/test_sql_logic.py
+```
+
+### PowerShell 一键回放
+```powershell
+powershell -ExecutionPolicy Bypass -File ecommerce_attribution_project/scripts/dev/run_spark_sandbox.ps1 -Target ecommerce_attribution_project/sql/etl/dws_etl.sql -Mock ecommerce_attribution_project/sql/test/mock_data_generation.sql -AssertRowCount -1 -Show 50
+
+# 当目标 SQL 为多语句且产出为视图/表时，可指定最终视图：
+powershell -ExecutionPolicy Bypass -File ecommerce_attribution_project/scripts/dev/run_spark_sandbox.ps1 -Target ecommerce_attribution_project/sql/etl/run_all_etl.sql -Mock ecommerce_attribution_project/sql/test/mock_data_generation.sql -FinalView ads_result_view -Show 50
+
+# 可选在回放前创建标准化别名视图（便于固定 FinalView 名称）
+powershell -ExecutionPolicy Bypass -File ecommerce_attribution_project/scripts/dev/run_spark_sandbox.ps1 -Target ecommerce_attribution_project/sql/etl/run_all_etl.sql -Mock ecommerce_attribution_project/sql/test/mock_data_generation.sql -Prepare ecommerce_attribution_project/sql/etl/final_views.sql -FinalView ads_result_view -Show 50
+```
