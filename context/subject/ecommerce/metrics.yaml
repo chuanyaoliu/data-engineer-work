@@ -1,0 +1,34 @@
+subject: ecommerce
+theme: orders
+time_grain: day
+tables:
+  - name: dwh.dwd.orders_dwd
+    primary_key: [order_id]
+    event_time: event_time
+    partition: dt
+metrics:
+  - name: order_cnt
+    type: count
+    expr: "*"
+    description: 订单行数
+    dimensions: [dt, status]
+  - name: gmvv
+    type: sum
+    expr: amount
+    description: 订单金额求和
+    dimensions: [dt, status]
+dimensions:
+  - name: status
+    values: ["SUCCESS","FAILED","PENDING"]
+  - name: dt
+    type: date
+rules:
+  - name: status_enum_valid
+    column: status
+    type: enum
+    values: ["SUCCESS","FAILED","PENDING"]
+  - name: pk_unique
+    columns: [order_id]
+    type: unique
+
+

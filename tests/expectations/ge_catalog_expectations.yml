@@ -1,0 +1,12 @@
+table: dwh.dwd.orders_dwd
+partition: dt
+rules:
+  - type: not_null
+    columns: [order_id, user_id, status, amount, event_time, dt]
+  - type: unique
+    columns: [order_id]
+  - type: enum
+    column: status
+    values: ["SUCCESS","FAILED","PENDING"]
+
+

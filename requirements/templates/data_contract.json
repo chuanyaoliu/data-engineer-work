@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Data Contract",
+  "type": "object",
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "table": { "type": "string" },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" },
+                "nullable": { "type": "boolean" },
+                "enum": { "type": "array", "items": { "type": "string" } },
+                "description": { "type": "string" }
+              },
+              "required": ["name", "type"]
+            }
+          }
+        },
+        "required": ["table", "columns"]
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "table": { "type": "string" },
+        "partition": { "type": "string" },
+        "primary_key": { "type": "array", "items": { "type": "string" } },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "nullable": { "type": "boolean" },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "type", "nullable"]
+          }
+        }
+      },
+      "required": ["table", "partition", "columns"]
+    },
+    "sla": {
+      "type": "object",
+      "properties": {
+        "partition_ready_by": { "type": "string", "description": "HH:MM" },
+        "late_tolerance_minutes": { "type": "integer" }
+      }
+    }
+  },
+  "required": ["inputs", "outputs"]
+}
+
+

@@ -1,0 +1,68 @@
+catalog: ecommerce
+databases:
+  - name: dwh
+    schemas:
+      - name: ods
+        tables:
+          - name: orders_ods
+            description: 原始订单明细（增量导入）
+            partition_keys: [dt]
+            primary_key: [order_id]
+            columns:
+              - name: order_id
+                type: string
+                nullable: false
+                sensitivity: low
+                comment: 订单ID
+              - name: user_id
+                type: string
+                nullable: false
+                sensitivity: low
+              - name: status
+                type: string
+                nullable: true
+                sensitivity: low
+                comment: 枚举：SUCCESS|FAILED|PENDING
+              - name: amount
+                type: decimal(18,2)
+                nullable: true
+                sensitivity: low
+              - name: event_time
+                type: timestamp
+                nullable: true
+                sensitivity: low
+              - name: dt
+                type: string
+                nullable: false
+                sensitivity: low
+      - name: dwd
+        tables:
+          - name: orders_dwd
+            description: 去重、晚到处理后的订单宽表
+            partition_keys: [dt]
+            primary_key: [order_id]
+            columns:
+              - name: order_id
+                type: string
+                nullable: false
+              - name: user_id
+                type: string
+                nullable: false
+              - name: status
+                type: string
+                nullable: false
+              - name: amount
+                type: decimal(18,2)
+                nullable: false
+              - name: event_time
+                type: timestamp
+                nullable: false
+              - name: _etl_load_time
+                type: timestamp
+                nullable: false
+                comment: 审计字段
+              - name: dt
+                type: string
+                nullable: false
+
+

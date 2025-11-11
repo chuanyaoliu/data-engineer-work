@@ -1,0 +1,18 @@
+name: ecommerce-orders
+description: 订单主题域 subagent（scoped context）
+context:
+  catalog_paths:
+    - context/catalog/sample_catalog.yaml
+  subject_paths:
+    - context/subject/ecommerce/metrics.yaml
+    - context/subject/ecommerce/reference_sql
+tools:
+  allow:
+    - spark_sql_readonly
+    - sql_explain
+    - metrics_query
+guardrails:
+  max_rows: 10000
+  default_time_window_days: 7
+
+
