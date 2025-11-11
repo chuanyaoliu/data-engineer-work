@@ -1,0 +1,16 @@
+{
+  "expectation_suite_name": "fact_order_suite",
+  "ge_cloud_id": null,
+  "data_asset_type": null,
+  "expectations": [
+    {"expectation_type": "expect_table_columns_to_match_set", "kwargs": {"column_set": ["order_id","user_id","product_id","amount","quantity","order_status","order_time","channel","region","dt"]}},
+    {"expectation_type": "expect_column_values_to_not_be_null", "kwargs": {"column": "order_id"}},
+    {"expectation_type": "expect_column_values_to_be_unique", "kwargs": {"column": "order_id"}},
+    {"expectation_type": "expect_column_values_to_not_be_null", "kwargs": {"column": "dt"}},
+    {"expectation_type": "expect_column_values_to_match_regex", "kwargs": {"column": "dt", "regex": "^\\d{4}-\\d{2}-\\d{2}$"}},
+    {"expectation_type": "expect_column_values_to_be_between", "kwargs": {"column": "quantity", "min_value": 0}},
+    {"expectation_type": "expect_column_values_to_be_between", "kwargs": {"column": "amount", "min_value": 0, "mostly": 0.95}},
+    {"expectation_type": "expect_column_values_to_be_in_set", "kwargs": {"column": "order_status", "value_set": ["paid","cancelled","refunded"]}}
+  ],
+  "meta": {"notes": {"format": "markdown", "content": ["Basic sanity checks for dwd.fact_order. 'amount' allows up to 5% negative to catch anomalies during testing."]}}
+}
