@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: fact_order
+    description: DWD fact table for orders
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: dt
+        tests:
+          - not_null
